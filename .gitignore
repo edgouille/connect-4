@@ -1,0 +1,18 @@
+# Ignore les fichiers générés par PyCharm
+.idea/
+
+# Ignore les fichiers .pyc, .pyo et __pycache__
+*.pyc
+*.pyo
+__pycache__
+
+# Ignore les fichiers de sauvegarde
+*~
+
+# Ignore les fichiers de configuration système
+.DS_Store
+Thumbs.db
+
+# Ignorer les fichiers de dépendances Python générés par pip
+venv/
+env/
