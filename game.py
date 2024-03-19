@@ -1,13 +1,36 @@
+import tkinter as tk
 from team import Team
+import numpy as np
 from board import Board
 
-class Game:
+#checkwin
+#popup win + restart
+#popup draw + restart
+
+
+class myApp(tk.Tk):
     def __init__(self):
         self.team1 = Team(1, "team1")
         self.team2 = Team(2, "team2")
         self.board = Board()
         self.turn = 1
-        self.play()
+        
+        tk.Tk.__init__(self)
+        self.configure(bg="light blue")
+        self.title("Connect 4")
+        self.geometry("730x700")
+        self.button_list = []
+        self.frame1 = frame(self,400, 400, "blue")
+        self.label1 = label(self.frame1, "Turn :", 20)
+        self.frame2 = frame(self ,700, 600)
+        for i in range(6):
+            row_buttons = []
+            for j in range(7):
+                button = Canvas(self.frame2, 100, 100, [i, j])
+                button.grid(row=i, column=j)
+                row_buttons.append(button)
+            self.button_list.append(row_buttons)
+        self.button_list = np.array(self.button_list)
     
     def play(self):
         while True:
@@ -25,17 +48,65 @@ class Game:
                 print("The winner is team ", self.board.check_win())
                 break
             
-            
-            
-    def current_turn(self, team):
-        while True:
-            print("It's team ", team.get_number(), " turn")
-            team_choice = team.play()
-            if self.board.check_play(team_choice):
-                self.board.place_piece(team.get_number(), team_choice)
-                self.board.display_board()
-                break
-            else:
-                print("This column is full, please choose another one.")
+    def update_board(self):
+        for i in range(6):
+            for j in range(7):
+                if self.board.board[i][j] == 1:
+                    self.button_list[i][j].config(bg="yellow")
+                if self.board.board[i][j] == 2:
+                    self.button_list[i][j].config(bg="red")
             
     
+    def current_turn(self, team_choice):
+        team = 1
+        if self.turn % 2 == 1:
+            team = 1
+        else:
+            team = 2
+        while True:
+            if self.board.check_play(team_choice):
+                self.board.place_piece(team, team_choice)
+                self.board.display_board()
+                return True
+            else:
+                return False
+    
+                
+    def update_turn(self):
+        self.label1.config(text=f"Turn : {self.turn}")
+        self.turn += 1
+        
+        
+class Canvas(tk.Canvas):
+    def __init__(self, master, w, h, index):
+        self.position = index
+        tk.Canvas.__init__(self, master, width=w, height=h, bg="light green")
+        self.grid()
+        self.bind("<Button-1>", lambda event: self.action(event, self.position))
+        
+
+    def action(self, event, index=None):
+        print("clicked at", index)
+        if (self.master.master.current_turn(index[1])):
+            self.master.master.update_turn()
+            self.master.master.update_board()
+        
+        
+        
+class frame(tk.Frame):
+    def __init__(self, master, w, h, color = None):
+        tk.Frame.__init__(self, master, width=w, height=h, bg=color)
+        self.pack(fill=tk.BOTH, side=tk.BOTTOM)
+    
+class label(tk.Label):
+    def __init__(self, master, text, size):
+        tk.Label.__init__(self, master, text=text, font=("Arial", size))
+        self.pack()
+
+
+
+window = myApp()
+
+# Add your Tkinter widgets and configurations here
+
+window.mainloop()
