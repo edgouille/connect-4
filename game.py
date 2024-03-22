@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox 
 from team import Team
 import numpy as np
 from board import Board
@@ -10,6 +11,7 @@ from board import Board
 
 class myApp(tk.Tk):
     def __init__(self):
+        self.game_state = 0
         self.team1 = Team(1, "team1")
         self.team2 = Team(2, "team2")
         self.board = Board()
@@ -70,6 +72,16 @@ class myApp(tk.Tk):
                 return True
             else:
                 return False
+            
+    def check_win(self):
+        if self.board.check_win() != 0:
+            if self.board.check_win() == 1:
+                print("The winner is team 1")
+            if self.board.check_win() == 2:
+                print("The winner is team 2")
+            messagebox.showinfo("Game Over", f"The winner is team {self.board.check_win()}")
+            return True
+        return False
     
                 
     def update_turn(self):
@@ -87,9 +99,12 @@ class Canvas(tk.Canvas):
 
     def action(self, event, index=None):
         print("clicked at", index)
-        if (self.master.master.current_turn(index[1])):
-            self.master.master.update_turn()
-            self.master.master.update_board()
+        if (self.master.master.game_state == 0):
+            if (self.master.master.current_turn(index[1])):
+                self.master.master.update_turn()
+                self.master.master.update_board()
+                if (self.master.master.check_win()):
+                    self.master.master.game_state = 1
         
         
         
@@ -103,10 +118,6 @@ class label(tk.Label):
         tk.Label.__init__(self, master, text=text, font=("Arial", size))
         self.pack()
 
-
-
 window = myApp()
-
-# Add your Tkinter widgets and configurations here
 
 window.mainloop()
