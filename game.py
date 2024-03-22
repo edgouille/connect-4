@@ -87,6 +87,9 @@ class myApp(tk.Tk):
     def update_turn(self):
         self.label1.config(text=f"Turn : {self.turn}")
         self.turn += 1
+        if (self.turn == 43):
+            messagebox.showinfo("Game Over", "It's a draw")
+            self.game_state = 1
         
         
 class Canvas(tk.Canvas):
