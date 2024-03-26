@@ -3,6 +3,7 @@ from tkinter import messagebox
 from team import Team
 import numpy as np
 from board import Board
+import pandas as pd
 
 class myApp(tk.Tk):
     def __init__(self):
@@ -11,6 +12,8 @@ class myApp(tk.Tk):
         self.team2 = Team(2, "team2")
         self.board = Board()
         self.turn = 1
+
+        self.log = pd.DataFrame()
 
         tk.Tk.__init__(self)
         self.configure(bg="light blue")
@@ -23,7 +26,7 @@ class myApp(tk.Tk):
         self.border_down = frame(self, 1000, 36, "blue")
         self.border_down.grid(row=2, column=0, columnspan=2)
 
-        self.menu_left = frame(self, 270, 620, "light grey")
+        self.menu_left = frame(self, 270, 620, "light blue")
         self.menu_left.grid(row=1, column=0, rowspan=2, sticky="n")
         self.show_turns = label(self.menu_left, "Turn :", 20)
         self.show_turns.grid(row=0, column=0, sticky="w", padx=10, pady=10)
@@ -32,7 +35,9 @@ class myApp(tk.Tk):
         self.show_scores_team2 = label(self.menu_left, "R :", 20)
         self.show_scores_team2.grid(row=2, column=0, sticky="w", padx=10, pady=10)
 
-        self.button_play = my_button(self.menu_left,"Play",5,5,"green","black",20,print("coucou"))
+        self.button_play = my_button(self.menu_left, "Play 1 vs 1", 15, 2, "green", "black", 20, self.solo)
+        self.button_play_vs_ai = my_button(self.menu_left, "Play VS AI", 15, 2, "green", "black", 20, self.vs_ai)
+        self.button_quit = my_button(self.menu_left, "QUIT", 15, 2, "green", "black", 20, self.quit)
 
         self.frame2 = frame(self, 700, 600)
         self.frame2.grid(row=1, column=1)
@@ -45,6 +50,25 @@ class myApp(tk.Tk):
                 row_buttons.append(button)
             self.button_list.append(row_buttons)
         self.button_list = np.array(self.button_list)
+
+    def quit(self):
+        self.destroy()
+
+    def solo(self):
+        replay = messagebox.askyesno("Replay", "Voulez-vous rejouer ?")
+        if replay:
+            self.reset_game()
+
+    def reset_game(self):
+        self.turn = 1
+        self.game_state = 0
+        self.board.clear_board()
+        self.clear_visual_board()
+
+    def clear_visual_board(self):
+        for i in range(6):
+            for j in range(7):
+                self.button_list[i][j].config(bg="light green")
 
     def play(self):
         while True:
@@ -69,6 +93,7 @@ class myApp(tk.Tk):
                     self.button_list[i][j].config(bg="yellow")
                 if self.board.board[i][j] == 2:
                     self.button_list[i][j].config(bg="red")
+
 
     def current_turn(self, team_choice):
         team = 1
@@ -117,9 +142,10 @@ class Canvas(tk.Canvas):
                 if (self.master.master.check_win()):
                     self.master.master.game_state = 1
 class my_button(tk.Button):
-    def __init__(self, master, text, width, height, bg, fg, size, fonction):
-        tk.Button.__init__(self, master, text=text, width=width, height=height,bg=bg,fg=fg,font=('Times New Roman', size), command=fonction)
+    def __init__(self, master, text, width, height, bg, fg, size, function):
+        tk.Button.__init__(self, master, text=text, width=width, height=height, bg=bg, fg=fg, font=('Times New Roman', size), command=function)
         self.grid()
+
 class frame(tk.Frame):
     def __init__(self, master, w, h, color=None):
         tk.Frame.__init__(self, master, width=w, height=h, bg=color)

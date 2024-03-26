@@ -8,7 +8,10 @@ class Board:
     def display_board(self):
         print(self.board)
 
+    def clear_board(self):
+        self.board = np.zeros((6, 7))
     def check_play(self, num_column):
+        print(type(num_column))
         column = self.board[:, num_column]
         if 0 in column:
             return True
