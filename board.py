@@ -7,6 +7,7 @@ class Board:
         
     def display_board(self):
         print(self.board)
+        
 
     def check_play(self, num_column):
         column = self.board[:, num_column]
@@ -15,7 +16,6 @@ class Board:
         return False
 
     def place_piece(self, team, num_column):
-        num_column -= 1
         line = 0
         column = self.board[:, num_column]
         if self.check_play(num_column):
@@ -26,6 +26,12 @@ class Board:
             print(f"l'equipe {team} à mis une piece a la position {line} {num_column}")
         else:
             print("vous ne pouvez pas choisir cette colonne")
+            
+    def is_column_full(self, num_column):
+        column = self.board[:, num_column]
+        if 0 in column:
+            return False
+        return True
 
     def check_win(self):
         if self.checkline() != 0:
