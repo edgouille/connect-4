@@ -2,16 +2,18 @@ import numpy as np
 
 
 class Board:
-    def __init__(self):
-        self.board = np.zeros((6, 7))
+    def __init__(self, board = np.zeros((6, 7))):
+        self.board = board
         
     def display_board(self):
         print(self.board)
+        
+    def get_board(self):
+        return self.board
 
     def clear_board(self):
         self.board = np.zeros((6, 7))
     def check_play(self, num_column):
-        print(type(num_column))
         column = self.board[:, num_column]
         if 0 in column:
             return True
@@ -22,12 +24,9 @@ class Board:
         column = self.board[:, num_column]
         if self.check_play(num_column):
             for i in range(len(column)):
-                if column[i] == 0:
+                if (column[i] == 0):
                     line = i
             self.board[line][num_column] = team
-            print(f"l'equipe {team} à mis une piece a la position {line} {num_column}")
-        else:
-            print("vous ne pouvez pas choisir cette colonne")
 
     def is_column_full(self, num_column):
         column = self.board[:, num_column]

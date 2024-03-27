@@ -3,6 +3,7 @@ from tkinter import messagebox
 from team import Team
 import numpy as np
 from board import Board
+from ia import IA
 import pandas as pd
 
 class myApp(tk.Tk):
@@ -11,6 +12,7 @@ class myApp(tk.Tk):
         self.team1 = Team(1, "team1")
         self.team2 = Team(2, "team2")
         self.board = Board()
+        self.ai = None
         self.turn = 1
 
         self.log = pd.DataFrame()
@@ -58,6 +60,15 @@ class myApp(tk.Tk):
         replay = messagebox.askyesno("Replay", "Voulez-vous rejouer ?")
         if replay:
             self.reset_game()
+            self.ai = None
+            
+    def vs_ai(self):
+        replay = messagebox.askyesno("VS AI", "Play against the AI ?")
+        if replay:
+            self.ai = IA(2)
+            self.reset_game()
+            self.current_turn()
+        
 
     def reset_game(self):
         self.turn = 1
@@ -70,22 +81,6 @@ class myApp(tk.Tk):
             for j in range(7):
                 self.button_list[i][j].config(bg="light green")
 
-    def play(self):
-        while True:
-            if self.turn % 2 == 1:
-                self.current_turn(self.team1)
-            else:
-                self.current_turn(self.team2)
-            self.turn += 1
-            if self.turn < 8:
-                continue
-            if self.turn == 43:
-                print("It's a draw")
-                break
-            if self.board.check_win() != 0:
-                print("The winner is team ", self.board.check_win())
-                break
-
     def update_board(self):
         for i in range(6):
             for j in range(7):
@@ -95,16 +90,21 @@ class myApp(tk.Tk):
                     self.button_list[i][j].config(bg="red")
 
 
-    def current_turn(self, team_choice):
-        team = 1
+    def current_turn(self, team_choice = None):
         if self.turn % 2 == 1:
             team = 1
         else:
-            team = 2
+            if self.ai is not None:
+                board_copy = np.copy(self.board.get_board())
+                team_choice = self.ai.play(Board(board_copy))
+                self.board.place_piece(2, team_choice)
+                self.update_turn()
+                return False
+            else:
+                team = 2
         while True:
             if self.board.check_play(team_choice):
                 self.board.place_piece(team, team_choice)
-                self.board.display_board()
                 return True
             else:
                 return False

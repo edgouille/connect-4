@@ -1,11 +1,13 @@
 import numpy as np
 import pandas as pd
+import copy
+from board import Board
 
 
 class IA:
     def __init__(self, team = 2):
-        choice = np.zeros((7, 1))
-        team_number = team
+        self.choice = np.array([0, 0, 0, 0, 0, 0, 0])
+        self.team_number = 2
     
     
     def clear_choice(self):
@@ -14,13 +16,16 @@ class IA:
     
     
     def play(self, board):
-        self.update_score()
+        self.update_score(board)
+        print(self.choice)
         to_play = np.argmax(self.choice)
+        print(to_play)
         self.clear_choice()
         return to_play
         
     
     def update_score(self, board):
+        #error board est toujours le meme entre chaque check
         self.is_full(board)
         if (self.winnable_choice(board)):
             return
@@ -37,6 +42,7 @@ class IA:
         board_copy = board
         for i in range(7):
             if self.choice[i] != -1000:
+                board_copy = copy.deepcopy(board)
                 board_copy.place_piece(self.team_number, i)
                 if (board_copy.is_column_full(i) == False):
                     board_copy.place_piece(opponent, i)
@@ -50,9 +56,9 @@ class IA:
                 
         pass
     
-    def is_full(self):
+    def is_full(self, board):
         for i in range(7):
-            if self.board[0][i] != 0:
+            if board.is_column_full(i):
                 self.choice[i] = -1000
                 
                 
