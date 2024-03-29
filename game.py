@@ -99,6 +99,9 @@ class myApp(tk.Tk):
                 team_choice = self.ai.play(Board(board_copy))
                 self.board.place_piece(2, team_choice)
                 self.update_turn()
+                self.update_board()
+                if self.check_win():
+                    self.game_state = 1
                 return False
             else:
                 team = 2
@@ -141,6 +144,11 @@ class Canvas(tk.Canvas):
                 self.master.master.update_board()
                 if (self.master.master.check_win()):
                     self.master.master.game_state = 1
+                    return
+            if (self.master.master.ai is not None):
+                self.master.master.current_turn()
+                
+
 class my_button(tk.Button):
     def __init__(self, master, text, width, height, bg, fg, size, function):
         tk.Button.__init__(self, master, text=text, width=width, height=height, bg=bg, fg=fg, font=('Times New Roman', size), command=function)

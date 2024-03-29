@@ -8,6 +8,9 @@ class Board:
     def display_board(self):
         print(self.board)
         
+    def change_board(self, board):
+        self.board = board
+        
     def get_board(self):
         return self.board
 
