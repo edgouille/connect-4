@@ -6,7 +6,7 @@ from board import Board
 
 class IA:
     def __init__(self, team = 2):
-        self.choice = np.array([0, 0, 0, 0, 0, 0, 0])
+        self.choice = np.array([-10, 0, 0, 0, 0, 0, -10])
         self.team_number = 2
         self.board = Board()
     
@@ -19,7 +19,8 @@ class IA:
     def play(self, board):
         self.update_score(board)
         print(self.choice)
-        to_play = np.argmax(self.choice)
+        max = np.max(self.choice)
+        to_play = np.random.choice(np.where(self.choice == max)[0])
         print(to_play)
         self.clear_choice()
         return to_play
