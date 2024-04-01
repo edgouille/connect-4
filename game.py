@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import messagebox
 from team import Team
@@ -16,6 +17,7 @@ class myApp(tk.Tk):
         self.turn = 1
 
         self.log = pd.DataFrame()
+        self.moves_team = pd.Series([np.NaN])
 
         tk.Tk.__init__(self)
         self.configure(bg="light blue")
@@ -53,6 +55,8 @@ class myApp(tk.Tk):
             self.button_list.append(row_buttons)
         self.button_list = np.array(self.button_list)
 
+
+
     def quit(self):
         self.destroy()
 
@@ -75,6 +79,9 @@ class myApp(tk.Tk):
         self.game_state = 0
         self.board.clear_board()
         self.clear_visual_board()
+        self.log = pd.DataFrame()
+        self.moves_team = pd.Series([np.NaN])
+
 
     def clear_visual_board(self):
         for i in range(6):
@@ -107,6 +114,11 @@ class myApp(tk.Tk):
                 team = 2
         while True:
             if self.board.check_play(team_choice):
+
+                self.moves_team.loc[self.turn] = team_choice
+                print(f"team{team} tour = {(self.turn + 1) // 2} choix = {team_choice}")
+                print(self.moves_team)
+
                 self.board.place_piece(team, team_choice)
                 return True
             else:
@@ -114,6 +126,22 @@ class myApp(tk.Tk):
 
     def check_win(self):
         if self.board.check_win() != 0:
+
+            winner = 1 if self.board.check_win() == 1 else 2
+            self.moves_team.loc[0] = winner
+
+            if not os.path.isfile("game_logs.csv") or os.stat("game_logs.csv").st_size == 0:
+                # Crée un DataFrame vide si le fichier n'existe pas ou s'il est vide
+                self.log = pd.DataFrame()
+            else:
+                # Charge le fichier de journalisation s'il existe et n'est pas vide
+                self.log = pd.read_csv("game_logs.csv")
+
+            self.log = pd.concat([self.log, self.moves_team], axis=1)
+            self.log.to_csv("game_logs.csv", index=False)
+
+
+            print(self.log, "test 1")
             if self.board.check_win() == 1:
                 print("The winner is team 1")
             if self.board.check_win() == 2:
@@ -122,7 +150,11 @@ class myApp(tk.Tk):
             return True
         return False
 
+
+
+
     def update_turn(self):
+
         self.show_turns.config(text=f"Turn : {self.turn}")
         self.turn += 1
         if (self.turn == 43):
@@ -137,7 +169,8 @@ class Canvas(tk.Canvas):
         self.bind("<Button-1>", lambda event: self.action(event, self.position))
 
     def action(self, event, index=None):
-        print("clicked at", index)
+        #print("clicked at", index)
+
         if (self.master.master.game_state == 0):
             if (self.master.master.current_turn(index[1])):
                 self.master.master.update_turn()
