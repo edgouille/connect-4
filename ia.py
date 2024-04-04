@@ -16,8 +16,8 @@ class IA:
             self.choice[i] = 0
     
     
-    def play(self, board):
-        self.update_score(board)
+    def play(self, board, turn):
+        self.update_score(board, turn)
         print(self.choice)
         max = np.max(self.choice)
         to_play = np.random.choice(np.where(self.choice == max)[0])
@@ -26,15 +26,14 @@ class IA:
         return to_play
         
     
-    def update_score(self, board):
-        #error board est toujours le meme entre chaque check
+    def update_score(self, board, turn):
         self.is_full(board)
         if (self.winnable_choice(board)):
             return
         if (self.blockable_choice(board)):
             return
         self.avoid_loosing_choice(board)
-        #check from older game
+        self.learn_older_games(turn)
         
     def avoid_loosing_choice(self, board):
         if self.team_number == 1:
@@ -80,3 +79,19 @@ class IA:
                     self.choice[i] = 900
                     return True
         return False
+    
+    def learn_older_games(self,turn):
+        df_import = pd.read_csv('game_logs.csv', sep = ',')
+        winner = []
+        for value in df_import.iloc[0].values:
+                winner.append(value)
+        for i in range(1, len(winner)):
+                column_values = df_import.iloc[1:, i].values
+                if column_values.size <= turn:
+                    return
+                if winner[i] == 1:
+                        if not pd.isna(column_values[turn]):
+                                self.choice[int(column_values[turn])] -=1
+                else:
+                        if not pd.isna(column_values[turn]):
+                                self.choice[int(column_values[turn])] +=1

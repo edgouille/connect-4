@@ -103,8 +103,9 @@ class myApp(tk.Tk):
         else:
             if self.ai is not None:
                 board_copy = np.copy(self.board.get_board())
-                team_choice = self.ai.play(Board(board_copy))
+                team_choice = self.ai.play(Board(board_copy), self.turn)
                 self.board.place_piece(2, team_choice)
+                self.moves_team.loc[self.turn] = team_choice
                 self.update_turn()
                 self.update_board()
                 if self.check_win():
@@ -119,7 +120,7 @@ class myApp(tk.Tk):
                 print(f"team{team} tour = {(self.turn + 1) // 2} choix = {team_choice}")
                 print(self.moves_team)
 
-                self.board.place_piece(team, team_choice)
+                self.board.place_piece(int(team), team_choice)
                 return True
             else:
                 return False
