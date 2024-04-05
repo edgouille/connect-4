@@ -18,10 +18,8 @@ class IA:
     
     def play(self, board, turn):
         self.update_score(board, turn)
-        print(self.choice)
         max = np.max(self.choice)
         to_play = np.random.choice(np.where(self.choice == max)[0])
-        print(to_play)
         self.clear_choice()
         return to_play
         
@@ -48,7 +46,6 @@ class IA:
                     self.board.place_piece(opponent, i)
                     if self.board.check_win() == opponent:
                         self.choice[i] -= 100
-            self.board.display_board()
             self.board.change_board(np.copy(board.get_board()))
             
     def is_full(self, board):

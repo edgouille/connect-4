@@ -117,9 +117,6 @@ class myApp(tk.Tk):
             if self.board.check_play(team_choice):
 
                 self.moves_team.loc[self.turn] = team_choice
-                print(f"team{team} tour = {(self.turn + 1) // 2} choix = {team_choice}")
-                print(self.moves_team)
-
                 self.board.place_piece(int(team), team_choice)
                 return True
             else:
@@ -141,8 +138,6 @@ class myApp(tk.Tk):
             self.log = pd.concat([self.log, self.moves_team], axis=1)
             self.log.to_csv("game_logs.csv", index=False)
 
-
-            print(self.log, "test 1")
             if self.board.check_win() == 1:
                 print("The winner is team 1")
             if self.board.check_win() == 2:
