@@ -7,6 +7,7 @@ from board import Board
 from ia import IA
 import pandas as pd
 
+
 class myApp(tk.Tk):
     def __init__(self):
         self.game_state = 0
@@ -15,6 +16,8 @@ class myApp(tk.Tk):
         self.board = Board()
         self.ai = None
         self.turn = 1
+        self.score_team1 = 0
+        self.score_team2 = 0
 
         self.log = pd.DataFrame()
         self.moves_team = pd.Series([np.NaN])
@@ -55,8 +58,6 @@ class myApp(tk.Tk):
             self.button_list.append(row_buttons)
         self.button_list = np.array(self.button_list)
 
-
-
     def quit(self):
         self.destroy()
 
@@ -65,14 +66,13 @@ class myApp(tk.Tk):
         if replay:
             self.reset_game()
             self.ai = None
-            
+
     def vs_ai(self):
         replay = messagebox.askyesno("VS AI", "Play against the AI ?")
         if replay:
             self.ai = IA(2)
             self.reset_game()
             self.current_turn()
-        
 
     def reset_game(self):
         self.turn = 1
@@ -81,7 +81,6 @@ class myApp(tk.Tk):
         self.clear_visual_board()
         self.log = pd.DataFrame()
         self.moves_team = pd.Series([np.NaN])
-
 
     def clear_visual_board(self):
         for i in range(6):
@@ -96,8 +95,8 @@ class myApp(tk.Tk):
                 if self.board.board[i][j] == 2:
                     self.button_list[i][j].config(bg="red")
 
-
-    def current_turn(self, team_choice = None):
+    def current_turn(self, team_choice=None):
+        self.update_score()
         if self.turn % 2 == 1:
             team = 1
         else:
@@ -146,8 +145,18 @@ class myApp(tk.Tk):
             return True
         return False
 
+    def update_score(self):
+        csv = pd.read_csv("game_logs.csv", sep=",")
+        winner = []
 
+        for value in csv.iloc[0].values:
+            winner.append(value)
 
+        self.score_team1 = winner.count(1)
+        self.score_team2 = winner.count(2)
+
+        self.show_scores_team1.config(text=f"Y : {self.score_team1}")
+        self.show_scores_team2.config(text=f"R : {self.score_team2}")
 
     def update_turn(self):
 
@@ -157,6 +166,7 @@ class myApp(tk.Tk):
             messagebox.showinfo("Game Over", "It's a draw")
             self.game_state = 1
 
+
 class Canvas(tk.Canvas):
     def __init__(self, master, w, h, index):
         self.position = index
@@ -165,7 +175,7 @@ class Canvas(tk.Canvas):
         self.bind("<Button-1>", lambda event: self.action(event, self.position))
 
     def action(self, event, index=None):
-        #print("clicked at", index)
+        # print("clicked at", index)
 
         if (self.master.master.game_state == 0):
             if (self.master.master.current_turn(index[1])):
@@ -176,24 +186,25 @@ class Canvas(tk.Canvas):
                     return
             if (self.master.master.ai is not None):
                 self.master.master.current_turn()
-                
+
 
 class my_button(tk.Button):
     def __init__(self, master, text, width, height, bg, fg, size, function):
-        tk.Button.__init__(self, master, text=text, width=width, height=height, bg=bg, fg=fg, font=('Times New Roman', size), command=function)
+        tk.Button.__init__(self, master, text=text, width=width, height=height, bg=bg, fg=fg,
+                           font=('Times New Roman', size), command=function)
         self.grid()
+
 
 class frame(tk.Frame):
     def __init__(self, master, w, h, color=None):
         tk.Frame.__init__(self, master, width=w, height=h, bg=color)
         self.grid()
 
+
 class label(tk.Label):
     def __init__(self, master, text, size):
         tk.Label.__init__(self, master, text=text, font=("Arial", size))
         self.grid()
-
-
 
 
 window = myApp()
